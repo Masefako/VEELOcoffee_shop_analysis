@@ -1,0 +1,42 @@
+--My Query for analysis.
+select product_category,
+       product_type,
+       product_detail,
+       store_location,
+--Aggregates     
+       sum(transaction_qty*unit_price) As total_revenue,
+        sum(transaction_qty) As total_units_sold,
+         count(transaction_id) As number_of_sales, 
+        
+--Dates    
+       TO_CHAR(transaction_date,'YYYY/MM') As purchase_date,
+        MONTHNAME(transaction_date) AS month_id,
+         DAYNAME(transaction_date) AS day_ofThe_week,
+         
+           
+  --Case statements    
+       case
+           when transaction_time between '04:00:00' and '11:59:59' then 'morning'
+            when transaction_time between '12:00:00' and '15:59:59' then 'afternoon'
+             when transaction_time between '16:00:00' and '20:59:59' then 'evening'
+              else 'night'
+         end As time_bucket,
+
+       case 
+          when sum(transaction_qty*unit_price) between 0 and 20 then 'low'
+           when sum(transaction_qty*unit_price) between 21 and 40 then 'medium'
+            when sum(transaction_qty*unit_price) between 41 and 60 then 'high'
+             else 'very high'
+         end As spent_bands,     
+        
+ from coffee.shop.sales  
+
+ --Groups
+ group by time_bucket,
+          purchase_date,
+          month_id,
+          day_ofThe_week,
+          product_category,
+          product_type,
+          product_detail,
+          store_location;
